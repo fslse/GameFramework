@@ -1,25 +1,18 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework.WebRequest
+﻿namespace GameFramework
 {
     /// <summary>
     /// Web 请求代理辅助器完成事件。
     /// </summary>
     public sealed class WebRequestAgentHelperCompleteEventArgs : GameFrameworkEventArgs
     {
-        private byte[] m_WebResponseBytes;
+        private byte[] _webResponseBytes;
 
         /// <summary>
         /// 初始化 Web 请求代理辅助器完成事件的新实例。
         /// </summary>
         public WebRequestAgentHelperCompleteEventArgs()
         {
-            m_WebResponseBytes = null;
+            _webResponseBytes = null;
         }
 
         /// <summary>
@@ -29,8 +22,8 @@ namespace GameFramework.WebRequest
         /// <returns>创建的 Web 请求代理辅助器完成事件。</returns>
         public static WebRequestAgentHelperCompleteEventArgs Create(byte[] webResponseBytes)
         {
-            WebRequestAgentHelperCompleteEventArgs webRequestAgentHelperCompleteEventArgs = ReferencePool.Acquire<WebRequestAgentHelperCompleteEventArgs>();
-            webRequestAgentHelperCompleteEventArgs.m_WebResponseBytes = webResponseBytes;
+            WebRequestAgentHelperCompleteEventArgs webRequestAgentHelperCompleteEventArgs = MemoryPool.Acquire<WebRequestAgentHelperCompleteEventArgs>();
+            webRequestAgentHelperCompleteEventArgs._webResponseBytes = webResponseBytes;
             return webRequestAgentHelperCompleteEventArgs;
         }
 
@@ -39,7 +32,7 @@ namespace GameFramework.WebRequest
         /// </summary>
         public override void Clear()
         {
-            m_WebResponseBytes = null;
+            _webResponseBytes = null;
         }
 
         /// <summary>
@@ -48,7 +41,7 @@ namespace GameFramework.WebRequest
         /// <returns>Web 响应的数据流。</returns>
         public byte[] GetWebResponseBytes()
         {
-            return m_WebResponseBytes;
+            return _webResponseBytes;
         }
     }
 }

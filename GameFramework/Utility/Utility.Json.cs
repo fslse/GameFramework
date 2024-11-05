@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 
 namespace GameFramework
 {
@@ -16,7 +9,7 @@ namespace GameFramework
         /// </summary>
         public static partial class Json
         {
-            private static IJsonHelper s_JsonHelper = null;
+            private static IJsonHelper _jsonHelper;
 
             /// <summary>
             /// 设置 JSON 辅助器。
@@ -24,7 +17,7 @@ namespace GameFramework
             /// <param name="jsonHelper">要设置的 JSON 辅助器。</param>
             public static void SetJsonHelper(IJsonHelper jsonHelper)
             {
-                s_JsonHelper = jsonHelper;
+                _jsonHelper = jsonHelper;
             }
 
             /// <summary>
@@ -34,14 +27,14 @@ namespace GameFramework
             /// <returns>序列化后的 JSON 字符串。</returns>
             public static string ToJson(object obj)
             {
-                if (s_JsonHelper == null)
+                if (_jsonHelper == null)
                 {
                     throw new GameFrameworkException("JSON helper is invalid.");
                 }
 
                 try
                 {
-                    return s_JsonHelper.ToJson(obj);
+                    return _jsonHelper.ToJson(obj);
                 }
                 catch (Exception exception)
                 {
@@ -50,7 +43,7 @@ namespace GameFramework
                         throw;
                     }
 
-                    throw new GameFrameworkException(Text.Format("Can not convert to JSON with exception '{0}'.", exception), exception);
+                    throw new GameFrameworkException($"Can not convert to JSON with exception '{exception}'.", exception);
                 }
             }
 
@@ -62,14 +55,14 @@ namespace GameFramework
             /// <returns>反序列化后的对象。</returns>
             public static T ToObject<T>(string json)
             {
-                if (s_JsonHelper == null)
+                if (_jsonHelper == null)
                 {
                     throw new GameFrameworkException("JSON helper is invalid.");
                 }
 
                 try
                 {
-                    return s_JsonHelper.ToObject<T>(json);
+                    return _jsonHelper.ToObject<T>(json);
                 }
                 catch (Exception exception)
                 {
@@ -78,7 +71,7 @@ namespace GameFramework
                         throw;
                     }
 
-                    throw new GameFrameworkException(Text.Format("Can not convert to object with exception '{0}'.", exception), exception);
+                    throw new GameFrameworkException($"Can not convert to object with exception '{exception}'.", exception);
                 }
             }
 
@@ -90,7 +83,7 @@ namespace GameFramework
             /// <returns>反序列化后的对象。</returns>
             public static object ToObject(Type objectType, string json)
             {
-                if (s_JsonHelper == null)
+                if (_jsonHelper == null)
                 {
                     throw new GameFrameworkException("JSON helper is invalid.");
                 }
@@ -102,7 +95,7 @@ namespace GameFramework
 
                 try
                 {
-                    return s_JsonHelper.ToObject(objectType, json);
+                    return _jsonHelper.ToObject(objectType, json);
                 }
                 catch (Exception exception)
                 {
@@ -111,7 +104,7 @@ namespace GameFramework
                         throw;
                     }
 
-                    throw new GameFrameworkException(Text.Format("Can not convert to object with exception '{0}'.", exception), exception);
+                    throw new GameFrameworkException($"Can not convert to object with exception '{exception}'.", exception);
                 }
             }
         }

@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GameFramework
@@ -17,12 +10,12 @@ namespace GameFramework
         /// </summary>
         public static class Assembly
         {
-            private static readonly System.Reflection.Assembly[] s_Assemblies = null;
-            private static readonly Dictionary<string, Type> s_CachedTypes = new Dictionary<string, Type>(StringComparer.Ordinal);
+            private static readonly System.Reflection.Assembly[] _assemblies;
+            private static readonly Dictionary<string, Type> _cachedTypes = new(StringComparer.Ordinal);
 
             static Assembly()
             {
-                s_Assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                _assemblies = AppDomain.CurrentDomain.GetAssemblies();
             }
 
             /// <summary>
@@ -31,7 +24,7 @@ namespace GameFramework
             /// <returns>已加载的程序集。</returns>
             public static System.Reflection.Assembly[] GetAssemblies()
             {
-                return s_Assemblies;
+                return _assemblies;
             }
 
             /// <summary>
@@ -41,7 +34,7 @@ namespace GameFramework
             public static Type[] GetTypes()
             {
                 List<Type> results = new List<Type>();
-                foreach (System.Reflection.Assembly assembly in s_Assemblies)
+                foreach (System.Reflection.Assembly assembly in _assemblies)
                 {
                     results.AddRange(assembly.GetTypes());
                 }
@@ -61,7 +54,7 @@ namespace GameFramework
                 }
 
                 results.Clear();
-                foreach (System.Reflection.Assembly assembly in s_Assemblies)
+                foreach (System.Reflection.Assembly assembly in _assemblies)
                 {
                     results.AddRange(assembly.GetTypes());
                 }
@@ -79,8 +72,7 @@ namespace GameFramework
                     throw new GameFrameworkException("Type name is invalid.");
                 }
 
-                Type type = null;
-                if (s_CachedTypes.TryGetValue(typeName, out type))
+                if (_cachedTypes.TryGetValue(typeName, out var type))
                 {
                     return type;
                 }
@@ -88,16 +80,16 @@ namespace GameFramework
                 type = Type.GetType(typeName);
                 if (type != null)
                 {
-                    s_CachedTypes.Add(typeName, type);
+                    _cachedTypes.Add(typeName, type);
                     return type;
                 }
 
-                foreach (System.Reflection.Assembly assembly in s_Assemblies)
+                foreach (System.Reflection.Assembly assembly in _assemblies)
                 {
-                    type = Type.GetType(Text.Format("{0}, {1}", typeName, assembly.FullName));
+                    type = Type.GetType($"{typeName}, {assembly.FullName}");
                     if (type != null)
                     {
-                        s_CachedTypes.Add(typeName, type);
+                        _cachedTypes.Add(typeName, type);
                         return type;
                     }
                 }

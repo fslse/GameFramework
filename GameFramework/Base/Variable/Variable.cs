@@ -1,18 +1,11 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 
 namespace GameFramework
 {
     /// <summary>
     /// 变量。
     /// </summary>
-    public abstract class Variable : IReference
+    public abstract class Variable : IMemory
     {
         /// <summary>
         /// 初始化变量的新实例。
@@ -24,10 +17,7 @@ namespace GameFramework
         /// <summary>
         /// 获取变量类型。
         /// </summary>
-        public abstract Type Type
-        {
-            get;
-        }
+        public abstract Type Type { get; }
 
         /// <summary>
         /// 获取变量值。

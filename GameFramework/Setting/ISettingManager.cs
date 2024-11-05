@@ -1,14 +1,7 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace GameFramework.Setting
+namespace GameFramework
 {
     /// <summary>
     /// 游戏配置管理器接口。
@@ -18,10 +11,7 @@ namespace GameFramework.Setting
         /// <summary>
         /// 获取游戏配置项数量。
         /// </summary>
-        int Count
-        {
-            get;
-        }
+        int Count { get; }
 
         /// <summary>
         /// 设置游戏配置辅助器。

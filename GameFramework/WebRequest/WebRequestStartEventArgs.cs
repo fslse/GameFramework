@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework.WebRequest
+﻿namespace GameFramework
 {
     /// <summary>
     /// Web 请求开始事件。
@@ -25,29 +18,17 @@ namespace GameFramework.WebRequest
         /// <summary>
         /// 获取 Web 请求任务的序列编号。
         /// </summary>
-        public int SerialId
-        {
-            get;
-            private set;
-        }
+        public int SerialId { get; private set; }
 
         /// <summary>
         /// 获取 Web 请求地址。
         /// </summary>
-        public string WebRequestUri
-        {
-            get;
-            private set;
-        }
+        public string WebRequestUri { get; private set; }
 
         /// <summary>
         /// 获取用户自定义数据。
         /// </summary>
-        public object UserData
-        {
-            get;
-            private set;
-        }
+        public object UserData { get; private set; }
 
         /// <summary>
         /// 创建 Web 请求开始事件。
@@ -58,7 +39,7 @@ namespace GameFramework.WebRequest
         /// <returns>创建的 Web 请求开始事件。</returns>
         public static WebRequestStartEventArgs Create(int serialId, string webRequestUri, object userData)
         {
-            WebRequestStartEventArgs webRequestStartEventArgs = ReferencePool.Acquire<WebRequestStartEventArgs>();
+            WebRequestStartEventArgs webRequestStartEventArgs = MemoryPool.Acquire<WebRequestStartEventArgs>();
             webRequestStartEventArgs.SerialId = serialId;
             webRequestStartEventArgs.WebRequestUri = webRequestUri;
             webRequestStartEventArgs.UserData = userData;

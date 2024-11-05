@@ -1,14 +1,6 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
+﻿using System;
 
-using GameFramework.Fsm;
-using System;
-
-namespace GameFramework.Procedure
+namespace GameFramework
 {
     /// <summary>
     /// 流程管理器接口。
@@ -18,18 +10,12 @@ namespace GameFramework.Procedure
         /// <summary>
         /// 获取当前流程。
         /// </summary>
-        ProcedureBase CurrentProcedure
-        {
-            get;
-        }
+        ProcedureBase CurrentProcedure { get; }
 
         /// <summary>
         /// 获取当前流程持续时间。
         /// </summary>
-        float CurrentProcedureTime
-        {
-            get;
-        }
+        float CurrentProcedureTime { get; }
 
         /// <summary>
         /// 初始化流程管理器。
