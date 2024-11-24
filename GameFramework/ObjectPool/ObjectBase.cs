@@ -1,113 +1,52 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
+﻿using System;
 
-using System;
-
-namespace GameFramework.ObjectPool
+namespace GameFramework
 {
     /// <summary>
     /// 对象基类。
     /// </summary>
-    public abstract class ObjectBase : IReference
+    public abstract class ObjectBase : IMemory
     {
-        private string m_Name;
-        private object m_Target;
-        private bool m_Locked;
-        private int m_Priority;
-        private DateTime m_LastUseTime;
-
-        /// <summary>
-        /// 初始化对象基类的新实例。
-        /// </summary>
-        public ObjectBase()
-        {
-            m_Name = null;
-            m_Target = null;
-            m_Locked = false;
-            m_Priority = 0;
-            m_LastUseTime = default(DateTime);
-        }
-
         /// <summary>
         /// 获取对象名称。
         /// </summary>
-        public string Name
-        {
-            get
-            {
-                return m_Name;
-            }
-        }
+        public string Name { get; private set; }
 
         /// <summary>
         /// 获取对象。
         /// </summary>
-        public object Target
-        {
-            get
-            {
-                return m_Target;
-            }
-        }
+        public object Target { get; private set; }
 
         /// <summary>
         /// 获取或设置对象是否被加锁。
         /// </summary>
-        public bool Locked
-        {
-            get
-            {
-                return m_Locked;
-            }
-            set
-            {
-                m_Locked = value;
-            }
-        }
+        public bool Locked { get; set; }
 
         /// <summary>
         /// 获取或设置对象的优先级。
         /// </summary>
-        public int Priority
-        {
-            get
-            {
-                return m_Priority;
-            }
-            set
-            {
-                m_Priority = value;
-            }
-        }
-
-        /// <summary>
-        /// 获取自定义释放检查标记。
-        /// </summary>
-        public virtual bool CustomCanReleaseFlag
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public int Priority { get; set; }
 
         /// <summary>
         /// 获取对象上次使用时间。
         /// </summary>
-        public DateTime LastUseTime
+        public DateTime LastUseTime { get; internal set; }
+
+        /// <summary>
+        /// 获取自定义释放检查标记。
+        /// </summary>
+        public virtual bool CustomCanReleaseFlag => true;
+
+        /// <summary>
+        /// 初始化对象基类的新实例。
+        /// </summary>
+        protected ObjectBase()
         {
-            get
-            {
-                return m_LastUseTime;
-            }
-            internal set
-            {
-                m_LastUseTime = value;
-            }
+            Name = null;
+            Target = null;
+            Locked = false;
+            Priority = 0;
+            LastUseTime = default;
         }
 
         /// <summary>
@@ -116,28 +55,7 @@ namespace GameFramework.ObjectPool
         /// <param name="target">对象。</param>
         protected void Initialize(object target)
         {
-            Initialize(null, target, false, 0);
-        }
-
-        /// <summary>
-        /// 初始化对象基类。
-        /// </summary>
-        /// <param name="name">对象名称。</param>
-        /// <param name="target">对象。</param>
-        protected void Initialize(string name, object target)
-        {
-            Initialize(name, target, false, 0);
-        }
-
-        /// <summary>
-        /// 初始化对象基类。
-        /// </summary>
-        /// <param name="name">对象名称。</param>
-        /// <param name="target">对象。</param>
-        /// <param name="locked">对象是否被加锁。</param>
-        protected void Initialize(string name, object target, bool locked)
-        {
-            Initialize(name, target, locked, 0);
+            Initialize(null, target);
         }
 
         /// <summary>
@@ -158,18 +76,13 @@ namespace GameFramework.ObjectPool
         /// <param name="target">对象。</param>
         /// <param name="locked">对象是否被加锁。</param>
         /// <param name="priority">对象的优先级。</param>
-        protected void Initialize(string name, object target, bool locked, int priority)
+        protected void Initialize(string name, object target, bool locked = false, int priority = 0)
         {
-            if (target == null)
-            {
-                throw new GameFrameworkException(Utility.Text.Format("Target '{0}' is invalid.", name));
-            }
-
-            m_Name = name ?? string.Empty;
-            m_Target = target;
-            m_Locked = locked;
-            m_Priority = priority;
-            m_LastUseTime = DateTime.UtcNow;
+            Name = name ?? string.Empty;
+            Target = target ?? throw new GameFrameworkException($"Target '{name}' is invalid.");
+            Locked = locked;
+            Priority = priority;
+            LastUseTime = DateTime.UtcNow;
         }
 
         /// <summary>
@@ -177,11 +90,11 @@ namespace GameFramework.ObjectPool
         /// </summary>
         public virtual void Clear()
         {
-            m_Name = null;
-            m_Target = null;
-            m_Locked = false;
-            m_Priority = 0;
-            m_LastUseTime = default(DateTime);
+            Name = null;
+            Target = null;
+            Locked = false;
+            Priority = 0;
+            LastUseTime = default;
         }
 
         /// <summary>

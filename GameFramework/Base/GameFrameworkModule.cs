@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework
+﻿namespace GameFramework
 {
     /// <summary>
     /// 游戏框架模块抽象类。
@@ -16,13 +9,7 @@ namespace GameFramework
         /// 获取游戏框架模块优先级。
         /// </summary>
         /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
-        internal virtual int Priority
-        {
-            get
-            {
-                return 0;
-            }
-        }
+        internal virtual int Priority => 0;
 
         /// <summary>
         /// 游戏框架模块轮询。

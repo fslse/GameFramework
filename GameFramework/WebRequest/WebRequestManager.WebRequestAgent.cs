@@ -1,26 +1,21 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
+﻿using System;
 
-namespace GameFramework.WebRequest
+namespace GameFramework
 {
-    internal sealed partial class WebRequestManager : GameFrameworkModule, IWebRequestManager
+    internal sealed partial class WebRequestManager
     {
         /// <summary>
         /// Web 请求代理。
         /// </summary>
         private sealed class WebRequestAgent : ITaskAgent<WebRequestTask>
         {
-            private readonly IWebRequestAgentHelper m_Helper;
-            private WebRequestTask m_Task;
-            private float m_WaitTime;
+            private readonly IWebRequestAgentHelper _helper;
+            private WebRequestTask _task;
+            private float _waitTime;
 
-            public GameFrameworkAction<WebRequestAgent> WebRequestAgentStart;
-            public GameFrameworkAction<WebRequestAgent, byte[]> WebRequestAgentSuccess;
-            public GameFrameworkAction<WebRequestAgent, string> WebRequestAgentFailure;
+            public Action<WebRequestAgent> WebRequestAgentStart;
+            public Action<WebRequestAgent, byte[]> WebRequestAgentSuccess;
+            public Action<WebRequestAgent, string> WebRequestAgentFailure;
 
             /// <summary>
             /// 初始化 Web 请求代理的新实例。
@@ -28,14 +23,9 @@ namespace GameFramework.WebRequest
             /// <param name="webRequestAgentHelper">Web 请求代理辅助器。</param>
             public WebRequestAgent(IWebRequestAgentHelper webRequestAgentHelper)
             {
-                if (webRequestAgentHelper == null)
-                {
-                    throw new GameFrameworkException("Web request agent helper is invalid.");
-                }
-
-                m_Helper = webRequestAgentHelper;
-                m_Task = null;
-                m_WaitTime = 0f;
+                _helper = webRequestAgentHelper ?? throw new GameFrameworkException("Web request agent helper is invalid.");
+                _task = null;
+                _waitTime = 0f;
 
                 WebRequestAgentStart = null;
                 WebRequestAgentSuccess = null;
@@ -45,32 +35,20 @@ namespace GameFramework.WebRequest
             /// <summary>
             /// 获取 Web 请求任务。
             /// </summary>
-            public WebRequestTask Task
-            {
-                get
-                {
-                    return m_Task;
-                }
-            }
+            public WebRequestTask Task => _task;
 
             /// <summary>
             /// 获取已经等待时间。
             /// </summary>
-            public float WaitTime
-            {
-                get
-                {
-                    return m_WaitTime;
-                }
-            }
+            public float WaitTime => _waitTime;
 
             /// <summary>
             /// 初始化 Web 请求代理。
             /// </summary>
             public void Initialize()
             {
-                m_Helper.WebRequestAgentHelperComplete += OnWebRequestAgentHelperComplete;
-                m_Helper.WebRequestAgentHelperError += OnWebRequestAgentHelperError;
+                _helper.WebRequestAgentHelperComplete += OnWebRequestAgentHelperComplete;
+                _helper.WebRequestAgentHelperError += OnWebRequestAgentHelperError;
             }
 
             /// <summary>
@@ -80,14 +58,14 @@ namespace GameFramework.WebRequest
             /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
             public void Update(float elapseSeconds, float realElapseSeconds)
             {
-                if (m_Task.Status == WebRequestTaskStatus.Doing)
+                if (_task.Status == EWebRequestTaskStatus.Doing)
                 {
-                    m_WaitTime += realElapseSeconds;
-                    if (m_WaitTime >= m_Task.Timeout)
+                    _waitTime += realElapseSeconds;
+                    if (_waitTime >= _task.Timeout)
                     {
                         WebRequestAgentHelperErrorEventArgs webRequestAgentHelperErrorEventArgs = WebRequestAgentHelperErrorEventArgs.Create("Timeout");
                         OnWebRequestAgentHelperError(this, webRequestAgentHelperErrorEventArgs);
-                        ReferencePool.Release(webRequestAgentHelperErrorEventArgs);
+                        MemoryPool.Release(webRequestAgentHelperErrorEventArgs);
                     }
                 }
             }
@@ -98,8 +76,8 @@ namespace GameFramework.WebRequest
             public void Shutdown()
             {
                 Reset();
-                m_Helper.WebRequestAgentHelperComplete -= OnWebRequestAgentHelperComplete;
-                m_Helper.WebRequestAgentHelperError -= OnWebRequestAgentHelperError;
+                _helper.WebRequestAgentHelperComplete -= OnWebRequestAgentHelperComplete;
+                _helper.WebRequestAgentHelperError -= OnWebRequestAgentHelperError;
             }
 
             /// <summary>
@@ -107,33 +85,25 @@ namespace GameFramework.WebRequest
             /// </summary>
             /// <param name="task">要处理的 Web 请求任务。</param>
             /// <returns>开始处理任务的状态。</returns>
-            public StartTaskStatus Start(WebRequestTask task)
+            public EStartTaskStatus Start(WebRequestTask task)
             {
-                if (task == null)
-                {
-                    throw new GameFrameworkException("Task is invalid.");
-                }
+                _task = task ?? throw new GameFrameworkException("Task is invalid.");
+                _task.Status = EWebRequestTaskStatus.Doing;
 
-                m_Task = task;
-                m_Task.Status = WebRequestTaskStatus.Doing;
+                WebRequestAgentStart?.Invoke(this);
 
-                if (WebRequestAgentStart != null)
-                {
-                    WebRequestAgentStart(this);
-                }
-
-                byte[] postData = m_Task.GetPostData();
+                byte[] postData = _task.GetPostData();
                 if (postData == null)
                 {
-                    m_Helper.Request(m_Task.WebRequestUri, m_Task.UserData);
+                    _helper.Request(_task.WebRequestUri, _task.UserData);
                 }
                 else
                 {
-                    m_Helper.Request(m_Task.WebRequestUri, postData, m_Task.UserData);
+                    _helper.Request(_task.WebRequestUri, postData, _task.UserData);
                 }
 
-                m_WaitTime = 0f;
-                return StartTaskStatus.CanResume;
+                _waitTime = 0f;
+                return EStartTaskStatus.CanResume;
             }
 
             /// <summary>
@@ -141,35 +111,29 @@ namespace GameFramework.WebRequest
             /// </summary>
             public void Reset()
             {
-                m_Helper.Reset();
-                m_Task = null;
-                m_WaitTime = 0f;
+                _helper.Reset();
+                _task = null;
+                _waitTime = 0f;
             }
 
             private void OnWebRequestAgentHelperComplete(object sender, WebRequestAgentHelperCompleteEventArgs e)
             {
-                m_Helper.Reset();
-                m_Task.Status = WebRequestTaskStatus.Done;
+                _helper.Reset();
+                _task.Status = EWebRequestTaskStatus.Done;
 
-                if (WebRequestAgentSuccess != null)
-                {
-                    WebRequestAgentSuccess(this, e.GetWebResponseBytes());
-                }
+                WebRequestAgentSuccess?.Invoke(this, e.GetWebResponseBytes());
 
-                m_Task.Done = true;
+                _task.Done = true;
             }
 
             private void OnWebRequestAgentHelperError(object sender, WebRequestAgentHelperErrorEventArgs e)
             {
-                m_Helper.Reset();
-                m_Task.Status = WebRequestTaskStatus.Error;
+                _helper.Reset();
+                _task.Status = EWebRequestTaskStatus.Error;
 
-                if (WebRequestAgentFailure != null)
-                {
-                    WebRequestAgentFailure(this, e.ErrorMessage);
-                }
+                WebRequestAgentFailure?.Invoke(this, e.ErrorMessage);
 
-                m_Task.Done = true;
+                _task.Done = true;
             }
         }
     }

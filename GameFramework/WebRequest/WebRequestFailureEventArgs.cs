@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework.WebRequest
+﻿namespace GameFramework
 {
     /// <summary>
     /// Web 请求失败事件。
@@ -19,45 +12,29 @@ namespace GameFramework.WebRequest
         {
             SerialId = 0;
             WebRequestUri = null;
-            ErrorMessage = null;
             UserData = null;
+            ErrorMessage = null;
         }
 
         /// <summary>
         /// 获取 Web 请求任务的序列编号。
         /// </summary>
-        public int SerialId
-        {
-            get;
-            private set;
-        }
+        public int SerialId { get; private set; }
 
         /// <summary>
         /// 获取 Web 请求地址。
         /// </summary>
-        public string WebRequestUri
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
-        /// 获取错误信息。
-        /// </summary>
-        public string ErrorMessage
-        {
-            get;
-            private set;
-        }
+        public string WebRequestUri { get; private set; }
 
         /// <summary>
         /// 获取用户自定义数据。
         /// </summary>
-        public object UserData
-        {
-            get;
-            private set;
-        }
+        public object UserData { get; private set; }
+
+        /// <summary>
+        /// 获取错误信息。
+        /// </summary>
+        public string ErrorMessage { get; private set; }
 
         /// <summary>
         /// 创建 Web 请求失败事件。
@@ -67,13 +44,13 @@ namespace GameFramework.WebRequest
         /// <param name="errorMessage">错误信息。</param>
         /// <param name="userData">用户自定义数据。</param>
         /// <returns>创建的 Web 请求失败事件。</returns>
-        public static WebRequestFailureEventArgs Create(int serialId, string webRequestUri, string errorMessage, object userData)
+        public static WebRequestFailureEventArgs Create(int serialId, string webRequestUri, object userData, string errorMessage)
         {
-            WebRequestFailureEventArgs webRequestFailureEventArgs = ReferencePool.Acquire<WebRequestFailureEventArgs>();
+            WebRequestFailureEventArgs webRequestFailureEventArgs = MemoryPool.Acquire<WebRequestFailureEventArgs>();
             webRequestFailureEventArgs.SerialId = serialId;
             webRequestFailureEventArgs.WebRequestUri = webRequestUri;
-            webRequestFailureEventArgs.ErrorMessage = errorMessage;
             webRequestFailureEventArgs.UserData = userData;
+            webRequestFailureEventArgs.ErrorMessage = errorMessage;
             return webRequestFailureEventArgs;
         }
 
@@ -84,8 +61,8 @@ namespace GameFramework.WebRequest
         {
             SerialId = 0;
             WebRequestUri = null;
-            ErrorMessage = null;
             UserData = null;
+            ErrorMessage = null;
         }
     }
 }

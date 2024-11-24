@@ -1,127 +1,70 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
+﻿using System;
 
-using System;
-
-namespace GameFramework.ObjectPool
+namespace GameFramework
 {
     /// <summary>
     /// 对象池基类。
     /// </summary>
     public abstract class ObjectPoolBase
     {
-        private readonly string m_Name;
-
         /// <summary>
-        /// 初始化对象池基类的新实例。
+        /// 获取对象池名称。
         /// </summary>
-        public ObjectPoolBase()
-            : this(null)
-        {
-        }
+        public string Name { get; }
 
         /// <summary>
         /// 初始化对象池基类的新实例。
         /// </summary>
         /// <param name="name">对象池名称。</param>
-        public ObjectPoolBase(string name)
+        protected ObjectPoolBase(string name = null)
         {
-            m_Name = name ?? string.Empty;
-        }
-
-        /// <summary>
-        /// 获取对象池名称。
-        /// </summary>
-        public string Name
-        {
-            get
-            {
-                return m_Name;
-            }
+            Name = name ?? string.Empty;
         }
 
         /// <summary>
         /// 获取对象池完整名称。
         /// </summary>
-        public string FullName
-        {
-            get
-            {
-                return new TypeNamePair(ObjectType, m_Name).ToString();
-            }
-        }
+        public string FullName => new TypeNamePair(ObjectType, Name).ToString();
 
         /// <summary>
         /// 获取对象池对象类型。
         /// </summary>
-        public abstract Type ObjectType
-        {
-            get;
-        }
+        public abstract Type ObjectType { get; }
 
         /// <summary>
         /// 获取对象池中对象的数量。
         /// </summary>
-        public abstract int Count
-        {
-            get;
-        }
+        public abstract int Count { get; }
 
         /// <summary>
         /// 获取对象池中能被释放的对象的数量。
         /// </summary>
-        public abstract int CanReleaseCount
-        {
-            get;
-        }
+        public abstract int CanReleaseCount { get; }
 
         /// <summary>
         /// 获取是否允许对象被多次获取。
         /// </summary>
-        public abstract bool AllowMultiSpawn
-        {
-            get;
-        }
+        public abstract bool AllowMultiSpawn { get; }
 
         /// <summary>
         /// 获取或设置对象池自动释放可释放对象的间隔秒数。
         /// </summary>
-        public abstract float AutoReleaseInterval
-        {
-            get;
-            set;
-        }
+        public abstract float AutoReleaseInterval { get; set; }
 
         /// <summary>
         /// 获取或设置对象池的容量。
         /// </summary>
-        public abstract int Capacity
-        {
-            get;
-            set;
-        }
+        public abstract int Capacity { get; set; }
 
         /// <summary>
         /// 获取或设置对象池对象过期秒数。
         /// </summary>
-        public abstract float ExpireTime
-        {
-            get;
-            set;
-        }
+        public abstract float ExpireTime { get; set; }
 
         /// <summary>
         /// 获取或设置对象池的优先级。
         /// </summary>
-        public abstract int Priority
-        {
-            get;
-            set;
-        }
+        public abstract int Priority { get; set; }
 
         /// <summary>
         /// 释放对象池中的可释放对象。

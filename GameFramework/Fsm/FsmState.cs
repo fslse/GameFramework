@@ -1,13 +1,6 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
+﻿using System;
 
-using System;
-
-namespace GameFramework.Fsm
+namespace GameFramework
 {
     /// <summary>
     /// 有限状态机状态基类。
@@ -18,7 +11,7 @@ namespace GameFramework.Fsm
         /// <summary>
         /// 初始化有限状态机状态基类的新实例。
         /// </summary>
-        public FsmState()
+        protected FsmState()
         {
         }
 
@@ -72,7 +65,7 @@ namespace GameFramework.Fsm
         /// <param name="fsm">有限状态机引用。</param>
         protected void ChangeState<TState>(IFsm<T> fsm) where TState : FsmState<T>
         {
-            Fsm<T> fsmImplement = (Fsm<T>)fsm;
+            var fsmImplement = (Fsm<T>)fsm;
             if (fsmImplement == null)
             {
                 throw new GameFrameworkException("FSM is invalid.");
@@ -88,7 +81,7 @@ namespace GameFramework.Fsm
         /// <param name="stateType">要切换到的有限状态机状态类型。</param>
         protected void ChangeState(IFsm<T> fsm, Type stateType)
         {
-            Fsm<T> fsmImplement = (Fsm<T>)fsm;
+            var fsmImplement = (Fsm<T>)fsm;
             if (fsmImplement == null)
             {
                 throw new GameFrameworkException("FSM is invalid.");
@@ -101,7 +94,7 @@ namespace GameFramework.Fsm
 
             if (!typeof(FsmState<T>).IsAssignableFrom(stateType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("State type '{0}' is invalid.", stateType.FullName));
+                throw new GameFrameworkException($"State type '{stateType.FullName}' is invalid.");
             }
 
             fsmImplement.ChangeState(stateType);

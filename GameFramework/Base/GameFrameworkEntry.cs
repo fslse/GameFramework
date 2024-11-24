@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GameFramework
@@ -15,7 +8,7 @@ namespace GameFramework
     /// </summary>
     public static class GameFrameworkEntry
     {
-        private static readonly GameFrameworkLinkedList<GameFrameworkModule> s_GameFrameworkModules = new GameFrameworkLinkedList<GameFrameworkModule>();
+        private static readonly GameFrameworkLinkedList<GameFrameworkModule> _gameFrameworkModules = new();
 
         /// <summary>
         /// 所有游戏框架模块轮询。
@@ -24,7 +17,7 @@ namespace GameFramework
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
         public static void Update(float elapseSeconds, float realElapseSeconds)
         {
-            foreach (GameFrameworkModule module in s_GameFrameworkModules)
+            foreach (GameFrameworkModule module in _gameFrameworkModules)
             {
                 module.Update(elapseSeconds, realElapseSeconds);
             }
@@ -35,15 +28,14 @@ namespace GameFramework
         /// </summary>
         public static void Shutdown()
         {
-            for (LinkedListNode<GameFrameworkModule> current = s_GameFrameworkModules.Last; current != null; current = current.Previous)
+            for (LinkedListNode<GameFrameworkModule> current = _gameFrameworkModules.Last; current != null; current = current.Previous)
             {
                 current.Value.Shutdown();
             }
 
-            s_GameFrameworkModules.Clear();
-            ReferencePool.ClearAll();
+            _gameFrameworkModules.Clear();
+            MemoryPool.ClearAll();
             Utility.Marshal.FreeCachedHGlobal();
-            GameFrameworkLog.SetLogHelper(null);
         }
 
         /// <summary>
@@ -57,19 +49,19 @@ namespace GameFramework
             Type interfaceType = typeof(T);
             if (!interfaceType.IsInterface)
             {
-                throw new GameFrameworkException(Utility.Text.Format("You must get module by interface, but '{0}' is not.", interfaceType.FullName));
+                throw new GameFrameworkException($"You must get module by interface, but '{interfaceType.FullName}' is not.");
             }
 
-            if (!interfaceType.FullName.StartsWith("GameFramework.", StringComparison.Ordinal))
+            if (interfaceType.FullName != null && !interfaceType.FullName.StartsWith("GameFramework.", StringComparison.Ordinal))
             {
-                throw new GameFrameworkException(Utility.Text.Format("You must get a Game Framework module, but '{0}' is not.", interfaceType.FullName));
+                throw new GameFrameworkException($"You must get a Game Framework module, but '{interfaceType.FullName}' is not.");
             }
 
-            string moduleName = Utility.Text.Format("{0}.{1}", interfaceType.Namespace, interfaceType.Name.Substring(1));
+            string moduleName = $"{interfaceType.Namespace}.{interfaceType.Name.Substring(1)}";
             Type moduleType = Type.GetType(moduleName);
             if (moduleType == null)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Can not find Game Framework module type '{0}'.", moduleName));
+                throw new GameFrameworkException($"Can not find Game Framework module type '{moduleName}'.");
             }
 
             return GetModule(moduleType) as T;
@@ -83,7 +75,7 @@ namespace GameFramework
         /// <remarks>如果要获取的游戏框架模块不存在，则自动创建该游戏框架模块。</remarks>
         private static GameFrameworkModule GetModule(Type moduleType)
         {
-            foreach (GameFrameworkModule module in s_GameFrameworkModules)
+            foreach (GameFrameworkModule module in _gameFrameworkModules)
             {
                 if (module.GetType() == moduleType)
                 {
@@ -104,10 +96,10 @@ namespace GameFramework
             GameFrameworkModule module = (GameFrameworkModule)Activator.CreateInstance(moduleType);
             if (module == null)
             {
-                throw new GameFrameworkException(Utility.Text.Format("Can not create module '{0}'.", moduleType.FullName));
+                throw new GameFrameworkException($"Can not create module '{moduleType.FullName}'.");
             }
 
-            LinkedListNode<GameFrameworkModule> current = s_GameFrameworkModules.First;
+            LinkedListNode<GameFrameworkModule> current = _gameFrameworkModules.First;
             while (current != null)
             {
                 if (module.Priority > current.Value.Priority)
@@ -120,11 +112,11 @@ namespace GameFramework
 
             if (current != null)
             {
-                s_GameFrameworkModules.AddBefore(current, module);
+                _gameFrameworkModules.AddBefore(current, module);
             }
             else
             {
-                s_GameFrameworkModules.AddLast(module);
+                _gameFrameworkModules.AddLast(module);
             }
 
             return module;

@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 
 namespace GameFramework
 {
@@ -15,40 +8,28 @@ namespace GameFramework
     /// <typeparam name="T">变量类型。</typeparam>
     public abstract class Variable<T> : Variable
     {
-        private T m_Value;
+        private T _value;
 
         /// <summary>
         /// 初始化变量的新实例。
         /// </summary>
-        public Variable()
+        protected Variable()
         {
-            m_Value = default(T);
+            _value = default;
         }
 
         /// <summary>
         /// 获取变量类型。
         /// </summary>
-        public override Type Type
-        {
-            get
-            {
-                return typeof(T);
-            }
-        }
+        public override Type Type => typeof(T);
 
         /// <summary>
         /// 获取或设置变量值。
         /// </summary>
         public T Value
         {
-            get
-            {
-                return m_Value;
-            }
-            set
-            {
-                m_Value = value;
-            }
+            get => _value;
+            set => _value = value;
         }
 
         /// <summary>
@@ -57,7 +38,7 @@ namespace GameFramework
         /// <returns>变量值。</returns>
         public override object GetValue()
         {
-            return m_Value;
+            return _value;
         }
 
         /// <summary>
@@ -66,7 +47,7 @@ namespace GameFramework
         /// <param name="value">变量值。</param>
         public override void SetValue(object value)
         {
-            m_Value = (T)value;
+            _value = (T)value;
         }
 
         /// <summary>
@@ -74,7 +55,7 @@ namespace GameFramework
         /// </summary>
         public override void Clear()
         {
-            m_Value = default(T);
+            _value = default;
         }
 
         /// <summary>
@@ -83,7 +64,7 @@ namespace GameFramework
         /// <returns>变量字符串。</returns>
         public override string ToString()
         {
-            return (m_Value != null) ? m_Value.ToString() : "<Null>";
+            return _value != null ? _value.ToString() : "<Null>";
         }
     }
 }

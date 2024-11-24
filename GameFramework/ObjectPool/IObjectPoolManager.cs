@@ -1,14 +1,7 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace GameFramework.ObjectPool
+namespace GameFramework
 {
     /// <summary>
     /// 对象池管理器。
@@ -18,10 +11,7 @@ namespace GameFramework.ObjectPool
         /// <summary>
         /// 获取对象池数量。
         /// </summary>
-        int Count
-        {
-            get;
-        }
+        int Count { get; }
 
         /// <summary>
         /// 检查是否存在对象池。

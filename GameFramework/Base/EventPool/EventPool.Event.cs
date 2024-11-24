@@ -1,56 +1,28 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework
+﻿namespace GameFramework
 {
     internal sealed partial class EventPool<T> where T : BaseEventArgs
     {
         /// <summary>
         /// 事件结点。
         /// </summary>
-        private sealed class Event : IReference
+        private sealed class Event : IMemory
         {
-            private object m_Sender;
-            private T m_EventArgs;
+            public object Sender { get; private set; }
 
-            public Event()
-            {
-                m_Sender = null;
-                m_EventArgs = null;
-            }
-
-            public object Sender
-            {
-                get
-                {
-                    return m_Sender;
-                }
-            }
-
-            public T EventArgs
-            {
-                get
-                {
-                    return m_EventArgs;
-                }
-            }
+            public T EventArgs { get; private set; }
 
             public static Event Create(object sender, T e)
             {
-                Event eventNode = ReferencePool.Acquire<Event>();
-                eventNode.m_Sender = sender;
-                eventNode.m_EventArgs = e;
+                Event eventNode = MemoryPool.Acquire<Event>();
+                eventNode.Sender = sender;
+                eventNode.EventArgs = e;
                 return eventNode;
             }
 
             public void Clear()
             {
-                m_Sender = null;
-                m_EventArgs = null;
+                Sender = null;
+                EventArgs = null;
             }
         }
     }

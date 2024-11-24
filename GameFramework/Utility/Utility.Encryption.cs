@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 
 namespace GameFramework
 {
@@ -47,12 +40,7 @@ namespace GameFramework
             /// <returns>异或后的二进制流。</returns>
             public static byte[] GetXorBytes(byte[] bytes, byte[] code)
             {
-                if (bytes == null)
-                {
-                    return null;
-                }
-
-                return GetXorBytes(bytes, 0, bytes.Length, code);
+                return bytes == null ? null : GetXorBytes(bytes, 0, bytes.Length, code);
             }
 
             /// <summary>

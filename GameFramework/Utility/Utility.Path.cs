@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System.IO;
+﻿using System.IO;
 
 namespace GameFramework
 {
@@ -23,12 +16,7 @@ namespace GameFramework
             /// <returns>规范的路径。</returns>
             public static string GetRegularPath(string path)
             {
-                if (path == null)
-                {
-                    return null;
-                }
-
-                return path.Replace('\\', '/');
+                return path?.Replace('\\', '/');
             }
 
             /// <summary>

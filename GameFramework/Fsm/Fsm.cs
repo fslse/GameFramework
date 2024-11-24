@@ -1,128 +1,73 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace GameFramework.Fsm
+namespace GameFramework
 {
     /// <summary>
     /// 有限状态机。
     /// </summary>
     /// <typeparam name="T">有限状态机持有者类型。</typeparam>
-    internal sealed class Fsm<T> : FsmBase, IReference, IFsm<T> where T : class
+    internal sealed class Fsm<T> : FsmBase, IMemory, IFsm<T> where T : class
     {
-        private T m_Owner;
-        private readonly Dictionary<Type, FsmState<T>> m_States;
-        private Dictionary<string, Variable> m_Datas;
-        private FsmState<T> m_CurrentState;
-        private float m_CurrentStateTime;
-        private bool m_IsDestroyed;
+        private T _owner;
+        private readonly Dictionary<Type, FsmState<T>> _states;
+        private Dictionary<string, Variable> _datas;
+        private FsmState<T> _currentState;
+        private float _currentStateTime;
+        private bool _isDestroyed;
 
         /// <summary>
         /// 初始化有限状态机的新实例。
         /// </summary>
         public Fsm()
         {
-            m_Owner = null;
-            m_States = new Dictionary<Type, FsmState<T>>();
-            m_Datas = null;
-            m_CurrentState = null;
-            m_CurrentStateTime = 0f;
-            m_IsDestroyed = true;
+            _owner = null;
+            _states = new Dictionary<Type, FsmState<T>>();
+            _datas = null;
+            _currentState = null;
+            _currentStateTime = 0f;
+            _isDestroyed = true;
         }
 
         /// <summary>
         /// 获取有限状态机持有者。
         /// </summary>
-        public T Owner
-        {
-            get
-            {
-                return m_Owner;
-            }
-        }
+        public T Owner => _owner;
 
         /// <summary>
         /// 获取有限状态机持有者类型。
         /// </summary>
-        public override Type OwnerType
-        {
-            get
-            {
-                return typeof(T);
-            }
-        }
+        public override Type OwnerType => typeof(T);
 
         /// <summary>
         /// 获取有限状态机中状态的数量。
         /// </summary>
-        public override int FsmStateCount
-        {
-            get
-            {
-                return m_States.Count;
-            }
-        }
+        public override int FsmStateCount => _states.Count;
 
         /// <summary>
         /// 获取有限状态机是否正在运行。
         /// </summary>
-        public override bool IsRunning
-        {
-            get
-            {
-                return m_CurrentState != null;
-            }
-        }
+        public override bool IsRunning => _currentState != null;
 
         /// <summary>
         /// 获取有限状态机是否被销毁。
         /// </summary>
-        public override bool IsDestroyed
-        {
-            get
-            {
-                return m_IsDestroyed;
-            }
-        }
+        public override bool IsDestroyed => _isDestroyed;
 
         /// <summary>
         /// 获取当前有限状态机状态。
         /// </summary>
-        public FsmState<T> CurrentState
-        {
-            get
-            {
-                return m_CurrentState;
-            }
-        }
+        public FsmState<T> CurrentState => _currentState;
 
         /// <summary>
         /// 获取当前有限状态机状态名称。
         /// </summary>
-        public override string CurrentStateName
-        {
-            get
-            {
-                return m_CurrentState != null ? m_CurrentState.GetType().FullName : null;
-            }
-        }
+        public override string CurrentStateName => _currentState?.GetType().FullName;
 
         /// <summary>
         /// 获取当前有限状态机状态持续时间。
         /// </summary>
-        public override float CurrentStateTime
-        {
-            get
-            {
-                return m_CurrentStateTime;
-            }
-        }
+        public override float CurrentStateTime => _currentStateTime;
 
         /// <summary>
         /// 创建有限状态机。
@@ -143,10 +88,10 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("FSM states is invalid.");
             }
 
-            Fsm<T> fsm = ReferencePool.Acquire<Fsm<T>>();
+            Fsm<T> fsm = MemoryPool.Acquire<Fsm<T>>();
             fsm.Name = name;
-            fsm.m_Owner = owner;
-            fsm.m_IsDestroyed = false;
+            fsm._owner = owner;
+            fsm._isDestroyed = false;
             foreach (FsmState<T> state in states)
             {
                 if (state == null)
@@ -155,12 +100,12 @@ namespace GameFramework.Fsm
                 }
 
                 Type stateType = state.GetType();
-                if (fsm.m_States.ContainsKey(stateType))
+                if (fsm._states.ContainsKey(stateType))
                 {
-                    throw new GameFrameworkException(Utility.Text.Format("FSM '{0}' state '{1}' is already exist.", new TypeNamePair(typeof(T), name), stateType.FullName));
+                    throw new GameFrameworkException($"FSM '{new TypeNamePair(typeof(T), name)}' state '{stateType.FullName}' is already exist.");
                 }
 
-                fsm.m_States.Add(stateType, state);
+                fsm._states.Add(stateType, state);
                 state.OnInit(fsm);
             }
 
@@ -186,10 +131,10 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("FSM states is invalid.");
             }
 
-            Fsm<T> fsm = ReferencePool.Acquire<Fsm<T>>();
+            Fsm<T> fsm = MemoryPool.Acquire<Fsm<T>>();
             fsm.Name = name;
-            fsm.m_Owner = owner;
-            fsm.m_IsDestroyed = false;
+            fsm._owner = owner;
+            fsm._isDestroyed = false;
             foreach (FsmState<T> state in states)
             {
                 if (state == null)
@@ -198,12 +143,12 @@ namespace GameFramework.Fsm
                 }
 
                 Type stateType = state.GetType();
-                if (fsm.m_States.ContainsKey(stateType))
+                if (fsm._states.ContainsKey(stateType))
                 {
-                    throw new GameFrameworkException(Utility.Text.Format("FSM '{0}' state '{1}' is already exist.", new TypeNamePair(typeof(T), name), stateType.FullName));
+                    throw new GameFrameworkException($"FSM '{new TypeNamePair(typeof(T), name)}' state '{stateType.FullName}' is already exist.");
                 }
 
-                fsm.m_States.Add(stateType, state);
+                fsm._states.Add(stateType, state);
                 state.OnInit(fsm);
             }
 
@@ -215,38 +160,35 @@ namespace GameFramework.Fsm
         /// </summary>
         public void Clear()
         {
-            if (m_CurrentState != null)
-            {
-                m_CurrentState.OnLeave(this, true);
-            }
+            _currentState?.OnLeave(this, true);
 
-            foreach (KeyValuePair<Type, FsmState<T>> state in m_States)
+            foreach (KeyValuePair<Type, FsmState<T>> state in _states)
             {
                 state.Value.OnDestroy(this);
             }
 
             Name = null;
-            m_Owner = null;
-            m_States.Clear();
+            _owner = null;
+            _states.Clear();
 
-            if (m_Datas != null)
+            if (_datas != null)
             {
-                foreach (KeyValuePair<string, Variable> data in m_Datas)
+                foreach (KeyValuePair<string, Variable> data in _datas)
                 {
                     if (data.Value == null)
                     {
                         continue;
                     }
 
-                    ReferencePool.Release(data.Value);
+                    MemoryPool.Release(data.Value);
                 }
 
-                m_Datas.Clear();
+                _datas.Clear();
             }
 
-            m_CurrentState = null;
-            m_CurrentStateTime = 0f;
-            m_IsDestroyed = true;
+            _currentState = null;
+            _currentStateTime = 0f;
+            _isDestroyed = true;
         }
 
         /// <summary>
@@ -261,14 +203,10 @@ namespace GameFramework.Fsm
             }
 
             FsmState<T> state = GetState<TState>();
-            if (state == null)
-            {
-                throw new GameFrameworkException(Utility.Text.Format("FSM '{0}' can not start state '{1}' which is not exist.", new TypeNamePair(typeof(T), Name), typeof(TState).FullName));
-            }
 
-            m_CurrentStateTime = 0f;
-            m_CurrentState = state;
-            m_CurrentState.OnEnter(this);
+            _currentStateTime = 0f;
+            _currentState = state ?? throw new GameFrameworkException($"FSM '{new TypeNamePair(typeof(T), Name)}' can not start state '{typeof(TState).FullName}' which is not exist.");
+            _currentState.OnEnter(this);
         }
 
         /// <summary>
@@ -289,18 +227,14 @@ namespace GameFramework.Fsm
 
             if (!typeof(FsmState<T>).IsAssignableFrom(stateType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("State type '{0}' is invalid.", stateType.FullName));
+                throw new GameFrameworkException($"State type '{stateType.FullName}' is invalid.");
             }
 
             FsmState<T> state = GetState(stateType);
-            if (state == null)
-            {
-                throw new GameFrameworkException(Utility.Text.Format("FSM '{0}' can not start state '{1}' which is not exist.", new TypeNamePair(typeof(T), Name), stateType.FullName));
-            }
 
-            m_CurrentStateTime = 0f;
-            m_CurrentState = state;
-            m_CurrentState.OnEnter(this);
+            _currentStateTime = 0f;
+            _currentState = state ?? throw new GameFrameworkException($"FSM '{new TypeNamePair(typeof(T), Name)}' can not start state '{stateType.FullName}' which is not exist.");
+            _currentState.OnEnter(this);
         }
 
         /// <summary>
@@ -310,7 +244,7 @@ namespace GameFramework.Fsm
         /// <returns>是否存在有限状态机状态。</returns>
         public bool HasState<TState>() where TState : FsmState<T>
         {
-            return m_States.ContainsKey(typeof(TState));
+            return _states.ContainsKey(typeof(TState));
         }
 
         /// <summary>
@@ -327,10 +261,10 @@ namespace GameFramework.Fsm
 
             if (!typeof(FsmState<T>).IsAssignableFrom(stateType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("State type '{0}' is invalid.", stateType.FullName));
+                throw new GameFrameworkException($"State type '{stateType.FullName}' is invalid.");
             }
 
-            return m_States.ContainsKey(stateType);
+            return _states.ContainsKey(stateType);
         }
 
         /// <summary>
@@ -340,8 +274,7 @@ namespace GameFramework.Fsm
         /// <returns>要获取的有限状态机状态。</returns>
         public TState GetState<TState>() where TState : FsmState<T>
         {
-            FsmState<T> state = null;
-            if (m_States.TryGetValue(typeof(TState), out state))
+            if (_states.TryGetValue(typeof(TState), out var state))
             {
                 return (TState)state;
             }
@@ -363,16 +296,10 @@ namespace GameFramework.Fsm
 
             if (!typeof(FsmState<T>).IsAssignableFrom(stateType))
             {
-                throw new GameFrameworkException(Utility.Text.Format("State type '{0}' is invalid.", stateType.FullName));
+                throw new GameFrameworkException($"State type '{stateType.FullName}' is invalid.");
             }
 
-            FsmState<T> state = null;
-            if (m_States.TryGetValue(stateType, out state))
-            {
-                return state;
-            }
-
-            return null;
+            return _states.TryGetValue(stateType, out var state) ? state : null;
         }
 
         /// <summary>
@@ -382,8 +309,8 @@ namespace GameFramework.Fsm
         public FsmState<T>[] GetAllStates()
         {
             int index = 0;
-            FsmState<T>[] results = new FsmState<T>[m_States.Count];
-            foreach (KeyValuePair<Type, FsmState<T>> state in m_States)
+            FsmState<T>[] results = new FsmState<T>[_states.Count];
+            foreach (KeyValuePair<Type, FsmState<T>> state in _states)
             {
                 results[index++] = state.Value;
             }
@@ -403,7 +330,7 @@ namespace GameFramework.Fsm
             }
 
             results.Clear();
-            foreach (KeyValuePair<Type, FsmState<T>> state in m_States)
+            foreach (KeyValuePair<Type, FsmState<T>> state in _states)
             {
                 results.Add(state.Value);
             }
@@ -421,12 +348,7 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Data name is invalid.");
             }
 
-            if (m_Datas == null)
-            {
-                return false;
-            }
-
-            return m_Datas.ContainsKey(name);
+            return _datas != null && _datas.ContainsKey(name);
         }
 
         /// <summary>
@@ -452,18 +374,12 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Data name is invalid.");
             }
 
-            if (m_Datas == null)
+            if (_datas == null)
             {
                 return null;
             }
 
-            Variable data = null;
-            if (m_Datas.TryGetValue(name, out data))
-            {
-                return data;
-            }
-
-            return null;
+            return _datas.TryGetValue(name, out var data) ? data : null;
         }
 
         /// <summary>
@@ -489,18 +405,15 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Data name is invalid.");
             }
 
-            if (m_Datas == null)
-            {
-                m_Datas = new Dictionary<string, Variable>(StringComparer.Ordinal);
-            }
+            _datas ??= new Dictionary<string, Variable>(StringComparer.Ordinal);
 
             Variable oldData = GetData(name);
             if (oldData != null)
             {
-                ReferencePool.Release(oldData);
+                MemoryPool.Release(oldData);
             }
 
-            m_Datas[name] = data;
+            _datas[name] = data;
         }
 
         /// <summary>
@@ -515,7 +428,7 @@ namespace GameFramework.Fsm
                 throw new GameFrameworkException("Data name is invalid.");
             }
 
-            if (m_Datas == null)
+            if (_datas == null)
             {
                 return false;
             }
@@ -523,10 +436,10 @@ namespace GameFramework.Fsm
             Variable oldData = GetData(name);
             if (oldData != null)
             {
-                ReferencePool.Release(oldData);
+                MemoryPool.Release(oldData);
             }
 
-            return m_Datas.Remove(name);
+            return _datas.Remove(name);
         }
 
         /// <summary>
@@ -536,13 +449,13 @@ namespace GameFramework.Fsm
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
         internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
-            if (m_CurrentState == null)
+            if (_currentState == null)
             {
                 return;
             }
 
-            m_CurrentStateTime += elapseSeconds;
-            m_CurrentState.OnUpdate(this, elapseSeconds, realElapseSeconds);
+            _currentStateTime += elapseSeconds;
+            _currentState.OnUpdate(this, elapseSeconds, realElapseSeconds);
         }
 
         /// <summary>
@@ -550,7 +463,7 @@ namespace GameFramework.Fsm
         /// </summary>
         internal override void Shutdown()
         {
-            ReferencePool.Release(this);
+            MemoryPool.Release(this);
         }
 
         /// <summary>
@@ -568,7 +481,7 @@ namespace GameFramework.Fsm
         /// <param name="stateType">要切换到的有限状态机状态类型。</param>
         internal void ChangeState(Type stateType)
         {
-            if (m_CurrentState == null)
+            if (_currentState == null)
             {
                 throw new GameFrameworkException("Current state is invalid.");
             }
@@ -576,13 +489,13 @@ namespace GameFramework.Fsm
             FsmState<T> state = GetState(stateType);
             if (state == null)
             {
-                throw new GameFrameworkException(Utility.Text.Format("FSM '{0}' can not change state to '{1}' which is not exist.", new TypeNamePair(typeof(T), Name), stateType.FullName));
+                throw new GameFrameworkException($"FSM '{new TypeNamePair(typeof(T), Name)}' can not change state to '{stateType.FullName}' which is not exist.");
             }
 
-            m_CurrentState.OnLeave(this, false);
-            m_CurrentStateTime = 0f;
-            m_CurrentState = state;
-            m_CurrentState.OnEnter(this);
+            _currentState.OnLeave(this, false);
+            _currentStateTime = 0f;
+            _currentState = state;
+            _currentState.OnEnter(this);
         }
     }
 }

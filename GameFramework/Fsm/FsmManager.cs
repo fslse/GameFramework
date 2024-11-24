@@ -1,54 +1,35 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace GameFramework.Fsm
+namespace GameFramework
 {
     /// <summary>
     /// 有限状态机管理器。
     /// </summary>
     internal sealed class FsmManager : GameFrameworkModule, IFsmManager
     {
-        private readonly Dictionary<TypeNamePair, FsmBase> m_Fsms;
-        private readonly List<FsmBase> m_TempFsms;
+        private readonly Dictionary<TypeNamePair, FsmBase> _fsms;
+        private readonly List<FsmBase> _tempFsms;
 
         /// <summary>
         /// 初始化有限状态机管理器的新实例。
         /// </summary>
         public FsmManager()
         {
-            m_Fsms = new Dictionary<TypeNamePair, FsmBase>();
-            m_TempFsms = new List<FsmBase>();
+            _fsms = new Dictionary<TypeNamePair, FsmBase>();
+            _tempFsms = new List<FsmBase>();
         }
 
         /// <summary>
         /// 获取游戏框架模块优先级。
         /// </summary>
         /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
-        internal override int Priority
-        {
-            get
-            {
-                return 1;
-            }
-        }
+        internal override int Priority => 1;
 
         /// <summary>
         /// 获取有限状态机数量。
         /// </summary>
-        public int Count
-        {
-            get
-            {
-                return m_Fsms.Count;
-            }
-        }
+        public int Count => _fsms.Count;
 
         /// <summary>
         /// 有限状态机管理器轮询。
@@ -57,18 +38,18 @@ namespace GameFramework.Fsm
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
         internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
-            m_TempFsms.Clear();
-            if (m_Fsms.Count <= 0)
+            _tempFsms.Clear();
+            if (_fsms.Count <= 0)
             {
                 return;
             }
 
-            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in m_Fsms)
+            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in _fsms)
             {
-                m_TempFsms.Add(fsm.Value);
+                _tempFsms.Add(fsm.Value);
             }
 
-            foreach (FsmBase fsm in m_TempFsms)
+            foreach (FsmBase fsm in _tempFsms)
             {
                 if (fsm.IsDestroyed)
                 {
@@ -84,13 +65,13 @@ namespace GameFramework.Fsm
         /// </summary>
         internal override void Shutdown()
         {
-            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in m_Fsms)
+            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in _fsms)
             {
                 fsm.Value.Shutdown();
             }
 
-            m_Fsms.Clear();
-            m_TempFsms.Clear();
+            _fsms.Clear();
+            _tempFsms.Clear();
         }
 
         /// <summary>
@@ -204,8 +185,8 @@ namespace GameFramework.Fsm
         public FsmBase[] GetAllFsms()
         {
             int index = 0;
-            FsmBase[] results = new FsmBase[m_Fsms.Count];
-            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in m_Fsms)
+            FsmBase[] results = new FsmBase[_fsms.Count];
+            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in _fsms)
             {
                 results[index++] = fsm.Value;
             }
@@ -225,7 +206,7 @@ namespace GameFramework.Fsm
             }
 
             results.Clear();
-            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in m_Fsms)
+            foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in _fsms)
             {
                 results.Add(fsm.Value);
             }
@@ -256,11 +237,11 @@ namespace GameFramework.Fsm
             TypeNamePair typeNamePair = new TypeNamePair(typeof(T), name);
             if (HasFsm<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist FSM '{0}'.", typeNamePair));
+                throw new GameFrameworkException($"Already exist FSM '{typeNamePair}'.");
             }
 
             Fsm<T> fsm = Fsm<T>.Create(name, owner, states);
-            m_Fsms.Add(typeNamePair, fsm);
+            _fsms.Add(typeNamePair, fsm);
             return fsm;
         }
 
@@ -289,11 +270,11 @@ namespace GameFramework.Fsm
             TypeNamePair typeNamePair = new TypeNamePair(typeof(T), name);
             if (HasFsm<T>(name))
             {
-                throw new GameFrameworkException(Utility.Text.Format("Already exist FSM '{0}'.", typeNamePair));
+                throw new GameFrameworkException($"Already exist FSM '{typeNamePair}'.");
             }
 
             Fsm<T> fsm = Fsm<T>.Create(name, owner, states);
-            m_Fsms.Add(typeNamePair, fsm);
+            _fsms.Add(typeNamePair, fsm);
             return fsm;
         }
 
@@ -382,27 +363,20 @@ namespace GameFramework.Fsm
 
         private bool InternalHasFsm(TypeNamePair typeNamePair)
         {
-            return m_Fsms.ContainsKey(typeNamePair);
+            return _fsms.ContainsKey(typeNamePair);
         }
 
         private FsmBase InternalGetFsm(TypeNamePair typeNamePair)
         {
-            FsmBase fsm = null;
-            if (m_Fsms.TryGetValue(typeNamePair, out fsm))
-            {
-                return fsm;
-            }
-
-            return null;
+            return _fsms.TryGetValue(typeNamePair, out var fsm) ? fsm : null;
         }
 
         private bool InternalDestroyFsm(TypeNamePair typeNamePair)
         {
-            FsmBase fsm = null;
-            if (m_Fsms.TryGetValue(typeNamePair, out fsm))
+            if (_fsms.TryGetValue(typeNamePair, out var fsm))
             {
                 fsm.Shutdown();
-                return m_Fsms.Remove(typeNamePair);
+                return _fsms.Remove(typeNamePair);
             }
 
             return false;

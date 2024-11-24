@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Text;
 
 namespace GameFramework
@@ -23,22 +16,12 @@ namespace GameFramework
             /// <summary>
             /// 获取数据在此计算机结构中存储时的字节顺序。
             /// </summary>
-            public static bool IsLittleEndian
-            {
-                get
-                {
-                    return BitConverter.IsLittleEndian;
-                }
-            }
+            public static bool IsLittleEndian => BitConverter.IsLittleEndian;
 
             /// <summary>
             /// 获取或设置屏幕每英寸点数。
             /// </summary>
-            public static float ScreenDpi
-            {
-                get;
-                set;
-            }
+            public static float ScreenDpi { get; set; }
 
             /// <summary>
             /// 将像素转换为厘米。

@@ -1,109 +1,55 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-namespace GameFramework
+﻿namespace GameFramework
 {
     /// <summary>
     /// 任务基类。
     /// </summary>
-    internal abstract class TaskBase : IReference
+    internal abstract class TaskBase : IMemory
     {
         /// <summary>
         /// 任务默认优先级。
         /// </summary>
         public const int DefaultPriority = 0;
 
-        private int m_SerialId;
-        private string m_Tag;
-        private int m_Priority;
-        private object m_UserData;
-
-        private bool m_Done;
-
-        /// <summary>
-        /// 初始化任务基类的新实例。
-        /// </summary>
-        public TaskBase()
-        {
-            m_SerialId = 0;
-            m_Tag = null;
-            m_Priority = DefaultPriority;
-            m_Done = false;
-            m_UserData = null;
-        }
-
         /// <summary>
         /// 获取任务的序列编号。
         /// </summary>
-        public int SerialId
-        {
-            get
-            {
-                return m_SerialId;
-            }
-        }
+        public int SerialId { get; private set; }
 
         /// <summary>
         /// 获取任务的标签。
         /// </summary>
-        public string Tag
-        {
-            get
-            {
-                return m_Tag;
-            }
-        }
+        public string Tag { get; private set; }
 
         /// <summary>
         /// 获取任务的优先级。
         /// </summary>
-        public int Priority
-        {
-            get
-            {
-                return m_Priority;
-            }
-        }
+        public int Priority { get; private set; }
 
         /// <summary>
         /// 获取任务的用户自定义数据。
         /// </summary>
-        public object UserData
-        {
-            get
-            {
-                return m_UserData;
-            }
-        }
+        public object UserData { get; private set; }
 
         /// <summary>
         /// 获取或设置任务是否完成。
         /// </summary>
-        public bool Done
-        {
-            get
-            {
-                return m_Done;
-            }
-            set
-            {
-                m_Done = value;
-            }
-        }
+        public bool Done { get; set; }
 
         /// <summary>
         /// 获取任务描述。
         /// </summary>
-        public virtual string Description
+        public virtual string Description => null;
+
+        /// <summary>
+        /// 初始化任务基类的新实例。
+        /// </summary>
+        protected TaskBase()
         {
-            get
-            {
-                return null;
-            }
+            SerialId = 0;
+            Tag = null;
+            Priority = DefaultPriority;
+            Done = false;
+            UserData = null;
         }
 
         /// <summary>
@@ -115,11 +61,11 @@ namespace GameFramework
         /// <param name="userData">任务的用户自定义数据。</param>
         internal void Initialize(int serialId, string tag, int priority, object userData)
         {
-            m_SerialId = serialId;
-            m_Tag = tag;
-            m_Priority = priority;
-            m_UserData = userData;
-            m_Done = false;
+            SerialId = serialId;
+            Tag = tag;
+            Priority = priority;
+            UserData = userData;
+            Done = false;
         }
 
         /// <summary>
@@ -127,11 +73,11 @@ namespace GameFramework
         /// </summary>
         public virtual void Clear()
         {
-            m_SerialId = 0;
-            m_Tag = null;
-            m_Priority = DefaultPriority;
-            m_UserData = null;
-            m_Done = false;
+            SerialId = 0;
+            Tag = null;
+            Priority = DefaultPriority;
+            UserData = null;
+            Done = false;
         }
     }
 }

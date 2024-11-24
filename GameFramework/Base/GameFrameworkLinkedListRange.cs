@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -16,10 +9,10 @@ namespace GameFramework
     /// </summary>
     /// <typeparam name="T">指定链表范围的元素类型。</typeparam>
     [StructLayout(LayoutKind.Auto)]
-    public struct GameFrameworkLinkedListRange<T> : IEnumerable<T>, IEnumerable
+    public readonly struct GameFrameworkLinkedListRange<T> : IEnumerable<T>
     {
-        private readonly LinkedListNode<T> m_First;
-        private readonly LinkedListNode<T> m_Terminal;
+        private readonly LinkedListNode<T> _first;
+        private readonly LinkedListNode<T> _terminal;
 
         /// <summary>
         /// 初始化游戏框架链表范围的新实例。
@@ -33,42 +26,24 @@ namespace GameFramework
                 throw new GameFrameworkException("Range is invalid.");
             }
 
-            m_First = first;
-            m_Terminal = terminal;
+            _first = first;
+            _terminal = terminal;
         }
 
         /// <summary>
         /// 获取链表范围是否有效。
         /// </summary>
-        public bool IsValid
-        {
-            get
-            {
-                return m_First != null && m_Terminal != null && m_First != m_Terminal;
-            }
-        }
+        public bool IsValid => _first != null && _terminal != null && _first != _terminal;
 
         /// <summary>
         /// 获取链表范围的开始结点。
         /// </summary>
-        public LinkedListNode<T> First
-        {
-            get
-            {
-                return m_First;
-            }
-        }
+        public LinkedListNode<T> First => _first;
 
         /// <summary>
         /// 获取链表范围的终结标记结点。
         /// </summary>
-        public LinkedListNode<T> Terminal
-        {
-            get
-            {
-                return m_Terminal;
-            }
-        }
+        public LinkedListNode<T> Terminal => _terminal;
 
         /// <summary>
         /// 获取链表范围的结点数量。
@@ -83,7 +58,7 @@ namespace GameFramework
                 }
 
                 int count = 0;
-                for (LinkedListNode<T> current = m_First; current != null && current != m_Terminal; current = current.Next)
+                for (LinkedListNode<T> current = _first; current != null && current != _terminal; current = current.Next)
                 {
                     count++;
                 }
@@ -99,7 +74,7 @@ namespace GameFramework
         /// <returns>是否包含指定值。</returns>
         public bool Contains(T value)
         {
-            for (LinkedListNode<T> current = m_First; current != null && current != m_Terminal; current = current.Next)
+            for (LinkedListNode<T> current = _first; current != null && current != _terminal; current = current.Next)
             {
                 if (current.Value.Equals(value))
                 {
@@ -141,11 +116,11 @@ namespace GameFramework
         /// 循环访问集合的枚举数。
         /// </summary>
         [StructLayout(LayoutKind.Auto)]
-        public struct Enumerator : IEnumerator<T>, IEnumerator
+        public struct Enumerator : IEnumerator<T>
         {
-            private readonly GameFrameworkLinkedListRange<T> m_GameFrameworkLinkedListRange;
-            private LinkedListNode<T> m_Current;
-            private T m_CurrentValue;
+            private readonly GameFrameworkLinkedListRange<T> _gameFrameworkLinkedListRange;
+            private LinkedListNode<T> _current;
+            private T _currentValue;
 
             internal Enumerator(GameFrameworkLinkedListRange<T> range)
             {
@@ -154,39 +129,20 @@ namespace GameFramework
                     throw new GameFrameworkException("Range is invalid.");
                 }
 
-                m_GameFrameworkLinkedListRange = range;
-                m_Current = m_GameFrameworkLinkedListRange.m_First;
-                m_CurrentValue = default(T);
+                _gameFrameworkLinkedListRange = range;
+                _current = _gameFrameworkLinkedListRange._first;
+                _currentValue = default;
             }
 
             /// <summary>
             /// 获取当前结点。
             /// </summary>
-            public T Current
-            {
-                get
-                {
-                    return m_CurrentValue;
-                }
-            }
+            public T Current => _currentValue;
 
             /// <summary>
             /// 获取当前的枚举数。
             /// </summary>
-            object IEnumerator.Current
-            {
-                get
-                {
-                    return m_CurrentValue;
-                }
-            }
-
-            /// <summary>
-            /// 清理枚举数。
-            /// </summary>
-            public void Dispose()
-            {
-            }
+            object IEnumerator.Current => _currentValue;
 
             /// <summary>
             /// 获取下一个结点。
@@ -194,13 +150,13 @@ namespace GameFramework
             /// <returns>返回下一个结点。</returns>
             public bool MoveNext()
             {
-                if (m_Current == null || m_Current == m_GameFrameworkLinkedListRange.m_Terminal)
+                if (_current == null || _current == _gameFrameworkLinkedListRange._terminal)
                 {
                     return false;
                 }
 
-                m_CurrentValue = m_Current.Value;
-                m_Current = m_Current.Next;
+                _currentValue = _current.Value;
+                _current = _current.Next;
                 return true;
             }
 
@@ -209,8 +165,15 @@ namespace GameFramework
             /// </summary>
             void IEnumerator.Reset()
             {
-                m_Current = m_GameFrameworkLinkedListRange.m_First;
-                m_CurrentValue = default(T);
+                _current = _gameFrameworkLinkedListRange._first;
+                _currentValue = default;
+            }
+
+            /// <summary>
+            /// 清理枚举数。
+            /// </summary>
+            public void Dispose()
+            {
             }
         }
     }

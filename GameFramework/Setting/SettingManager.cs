@@ -1,28 +1,21 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace GameFramework.Setting
+namespace GameFramework
 {
     /// <summary>
     /// 游戏配置管理器。
     /// </summary>
     internal sealed class SettingManager : GameFrameworkModule, ISettingManager
     {
-        private ISettingHelper m_SettingHelper;
+        private ISettingHelper _settingHelper;
 
         /// <summary>
         /// 初始化游戏配置管理器的新实例。
         /// </summary>
         public SettingManager()
         {
-            m_SettingHelper = null;
+            _settingHelper = null;
         }
 
         /// <summary>
@@ -32,12 +25,12 @@ namespace GameFramework.Setting
         {
             get
             {
-                if (m_SettingHelper == null)
+                if (_settingHelper == null)
                 {
                     throw new GameFrameworkException("Setting helper is invalid.");
                 }
 
-                return m_SettingHelper.Count;
+                return _settingHelper.Count;
             }
         }
 
@@ -64,12 +57,7 @@ namespace GameFramework.Setting
         /// <param name="settingHelper">游戏配置辅助器。</param>
         public void SetSettingHelper(ISettingHelper settingHelper)
         {
-            if (settingHelper == null)
-            {
-                throw new GameFrameworkException("Setting helper is invalid.");
-            }
-
-            m_SettingHelper = settingHelper;
+            _settingHelper = settingHelper ?? throw new GameFrameworkException("Setting helper is invalid.");
         }
 
         /// <summary>
@@ -78,12 +66,12 @@ namespace GameFramework.Setting
         /// <returns>是否加载游戏配置成功。</returns>
         public bool Load()
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
 
-            return m_SettingHelper.Load();
+            return _settingHelper.Load();
         }
 
         /// <summary>
@@ -92,12 +80,12 @@ namespace GameFramework.Setting
         /// <returns>是否保存游戏配置成功。</returns>
         public bool Save()
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
 
-            return m_SettingHelper.Save();
+            return _settingHelper.Save();
         }
 
         /// <summary>
@@ -106,12 +94,12 @@ namespace GameFramework.Setting
         /// <returns>所有游戏配置项的名称。</returns>
         public string[] GetAllSettingNames()
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
 
-            return m_SettingHelper.GetAllSettingNames();
+            return _settingHelper.GetAllSettingNames();
         }
 
         /// <summary>
@@ -120,12 +108,12 @@ namespace GameFramework.Setting
         /// <param name="results">所有游戏配置项的名称。</param>
         public void GetAllSettingNames(List<string> results)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
 
-            m_SettingHelper.GetAllSettingNames(results);
+            _settingHelper.GetAllSettingNames(results);
         }
 
         /// <summary>
@@ -135,7 +123,7 @@ namespace GameFramework.Setting
         /// <returns>指定的游戏配置项是否存在。</returns>
         public bool HasSetting(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -145,7 +133,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.HasSetting(settingName);
+            return _settingHelper.HasSetting(settingName);
         }
 
         /// <summary>
@@ -155,7 +143,7 @@ namespace GameFramework.Setting
         /// <returns>是否移除指定游戏配置项成功。</returns>
         public bool RemoveSetting(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -165,7 +153,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.RemoveSetting(settingName);
+            return _settingHelper.RemoveSetting(settingName);
         }
 
         /// <summary>
@@ -173,12 +161,12 @@ namespace GameFramework.Setting
         /// </summary>
         public void RemoveAllSettings()
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
 
-            m_SettingHelper.RemoveAllSettings();
+            _settingHelper.RemoveAllSettings();
         }
 
         /// <summary>
@@ -188,7 +176,7 @@ namespace GameFramework.Setting
         /// <returns>读取的布尔值。</returns>
         public bool GetBool(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -198,7 +186,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetBool(settingName);
+            return _settingHelper.GetBool(settingName);
         }
 
         /// <summary>
@@ -209,7 +197,7 @@ namespace GameFramework.Setting
         /// <returns>读取的布尔值。</returns>
         public bool GetBool(string settingName, bool defaultValue)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -219,7 +207,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetBool(settingName, defaultValue);
+            return _settingHelper.GetBool(settingName, defaultValue);
         }
 
         /// <summary>
@@ -229,7 +217,7 @@ namespace GameFramework.Setting
         /// <param name="value">要写入的布尔值。</param>
         public void SetBool(string settingName, bool value)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -239,7 +227,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetBool(settingName, value);
+            _settingHelper.SetBool(settingName, value);
         }
 
         /// <summary>
@@ -249,7 +237,7 @@ namespace GameFramework.Setting
         /// <returns>读取的整数值。</returns>
         public int GetInt(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -259,7 +247,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetInt(settingName);
+            return _settingHelper.GetInt(settingName);
         }
 
         /// <summary>
@@ -270,7 +258,7 @@ namespace GameFramework.Setting
         /// <returns>读取的整数值。</returns>
         public int GetInt(string settingName, int defaultValue)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -280,7 +268,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetInt(settingName, defaultValue);
+            return _settingHelper.GetInt(settingName, defaultValue);
         }
 
         /// <summary>
@@ -290,7 +278,7 @@ namespace GameFramework.Setting
         /// <param name="value">要写入的整数值。</param>
         public void SetInt(string settingName, int value)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -300,7 +288,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetInt(settingName, value);
+            _settingHelper.SetInt(settingName, value);
         }
 
         /// <summary>
@@ -310,7 +298,7 @@ namespace GameFramework.Setting
         /// <returns>读取的浮点数值。</returns>
         public float GetFloat(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -320,7 +308,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetFloat(settingName);
+            return _settingHelper.GetFloat(settingName);
         }
 
         /// <summary>
@@ -331,7 +319,7 @@ namespace GameFramework.Setting
         /// <returns>读取的浮点数值。</returns>
         public float GetFloat(string settingName, float defaultValue)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -341,7 +329,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetFloat(settingName, defaultValue);
+            return _settingHelper.GetFloat(settingName, defaultValue);
         }
 
         /// <summary>
@@ -351,7 +339,7 @@ namespace GameFramework.Setting
         /// <param name="value">要写入的浮点数值。</param>
         public void SetFloat(string settingName, float value)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -361,7 +349,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetFloat(settingName, value);
+            _settingHelper.SetFloat(settingName, value);
         }
 
         /// <summary>
@@ -371,7 +359,7 @@ namespace GameFramework.Setting
         /// <returns>读取的字符串值。</returns>
         public string GetString(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -381,7 +369,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetString(settingName);
+            return _settingHelper.GetString(settingName);
         }
 
         /// <summary>
@@ -392,7 +380,7 @@ namespace GameFramework.Setting
         /// <returns>读取的字符串值。</returns>
         public string GetString(string settingName, string defaultValue)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -402,7 +390,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetString(settingName, defaultValue);
+            return _settingHelper.GetString(settingName, defaultValue);
         }
 
         /// <summary>
@@ -412,7 +400,7 @@ namespace GameFramework.Setting
         /// <param name="value">要写入的字符串值。</param>
         public void SetString(string settingName, string value)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -422,7 +410,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetString(settingName, value);
+            _settingHelper.SetString(settingName, value);
         }
 
         /// <summary>
@@ -433,7 +421,7 @@ namespace GameFramework.Setting
         /// <returns>读取的对象。</returns>
         public T GetObject<T>(string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -443,7 +431,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetObject<T>(settingName);
+            return _settingHelper.GetObject<T>(settingName);
         }
 
         /// <summary>
@@ -454,7 +442,7 @@ namespace GameFramework.Setting
         /// <returns>读取的对象。</returns>
         public object GetObject(Type objectType, string settingName)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -469,7 +457,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetObject(objectType, settingName);
+            return _settingHelper.GetObject(objectType, settingName);
         }
 
         /// <summary>
@@ -481,7 +469,7 @@ namespace GameFramework.Setting
         /// <returns>读取的对象。</returns>
         public T GetObject<T>(string settingName, T defaultObj)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -491,7 +479,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetObject(settingName, defaultObj);
+            return _settingHelper.GetObject(settingName, defaultObj);
         }
 
         /// <summary>
@@ -503,7 +491,7 @@ namespace GameFramework.Setting
         /// <returns>读取的对象。</returns>
         public object GetObject(Type objectType, string settingName, object defaultObj)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -518,7 +506,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            return m_SettingHelper.GetObject(objectType, settingName, defaultObj);
+            return _settingHelper.GetObject(objectType, settingName, defaultObj);
         }
 
         /// <summary>
@@ -529,7 +517,7 @@ namespace GameFramework.Setting
         /// <param name="obj">要写入的对象。</param>
         public void SetObject<T>(string settingName, T obj)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -539,7 +527,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetObject(settingName, obj);
+            _settingHelper.SetObject(settingName, obj);
         }
 
         /// <summary>
@@ -549,7 +537,7 @@ namespace GameFramework.Setting
         /// <param name="obj">要写入的对象。</param>
         public void SetObject(string settingName, object obj)
         {
-            if (m_SettingHelper == null)
+            if (_settingHelper == null)
             {
                 throw new GameFrameworkException("Setting helper is invalid.");
             }
@@ -559,7 +547,7 @@ namespace GameFramework.Setting
                 throw new GameFrameworkException("Setting name is invalid.");
             }
 
-            m_SettingHelper.SetObject(settingName, obj);
+            _settingHelper.SetObject(settingName, obj);
         }
     }
 }

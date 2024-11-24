@@ -1,11 +1,4 @@
-﻿//------------------------------------------------------------
-// Game Framework
-// Copyright © 2013-2021 Jiang Yin. All rights reserved.
-// Homepage: https://gameframework.cn/
-// Feedback: mailto:ellan@gameframework.cn
-//------------------------------------------------------------
-
-using System;
+﻿using System;
 
 namespace GameFramework
 {
@@ -17,19 +10,13 @@ namespace GameFramework
         public static class Marshal
         {
             private const int BlockSize = 1024 * 4;
-            private static IntPtr s_CachedHGlobalPtr = IntPtr.Zero;
-            private static int s_CachedHGlobalSize = 0;
+            private static IntPtr _cachedHGlobalPtr = IntPtr.Zero;
+            private static int _cachedHGlobalSize;
 
             /// <summary>
             /// 获取缓存的从进程的非托管内存中分配的内存的大小。
             /// </summary>
-            public static int CachedHGlobalSize
-            {
-                get
-                {
-                    return s_CachedHGlobalSize;
-                }
-            }
+            public static int CachedHGlobalSize => _cachedHGlobalSize;
 
             /// <summary>
             /// 确保从进程的非托管内存中分配足够大小的内存并缓存。
@@ -42,12 +29,12 @@ namespace GameFramework
                     throw new GameFrameworkException("Ensure size is invalid.");
                 }
 
-                if (s_CachedHGlobalPtr == IntPtr.Zero || s_CachedHGlobalSize < ensureSize)
+                if (_cachedHGlobalPtr == IntPtr.Zero || _cachedHGlobalSize < ensureSize)
                 {
                     FreeCachedHGlobal();
                     int size = (ensureSize - 1 + BlockSize) / BlockSize * BlockSize;
-                    s_CachedHGlobalPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
-                    s_CachedHGlobalSize = size;
+                    _cachedHGlobalPtr = System.Runtime.InteropServices.Marshal.AllocHGlobal(size);
+                    _cachedHGlobalSize = size;
                 }
             }
 
@@ -56,19 +43,19 @@ namespace GameFramework
             /// </summary>
             public static void FreeCachedHGlobal()
             {
-                if (s_CachedHGlobalPtr != IntPtr.Zero)
+                if (_cachedHGlobalPtr != IntPtr.Zero)
                 {
-                    System.Runtime.InteropServices.Marshal.FreeHGlobal(s_CachedHGlobalPtr);
-                    s_CachedHGlobalPtr = IntPtr.Zero;
-                    s_CachedHGlobalSize = 0;
+                    System.Runtime.InteropServices.Marshal.FreeHGlobal(_cachedHGlobalPtr);
+                    _cachedHGlobalPtr = IntPtr.Zero;
+                    _cachedHGlobalSize = 0;
                 }
             }
 
             /// <summary>
             /// 将数据从对象转换为二进制流。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="structure">要转换的对象。</param>
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <returns>存储转换结果的二进制流。</returns>
             public static byte[] StructureToBytes<T>(T structure)
             {
@@ -78,9 +65,9 @@ namespace GameFramework
             /// <summary>
             /// 将数据从对象转换为二进制流。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="structure">要转换的对象。</param>
             /// <param name="structureSize">要转换的对象的大小。</param>
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <returns>存储转换结果的二进制流。</returns>
             internal static byte[] StructureToBytes<T>(T structure, int structureSize)
             {
@@ -90,43 +77,20 @@ namespace GameFramework
                 }
 
                 EnsureCachedHGlobalSize(structureSize);
-                System.Runtime.InteropServices.Marshal.StructureToPtr(structure, s_CachedHGlobalPtr, true);
+                System.Runtime.InteropServices.Marshal.StructureToPtr(structure, _cachedHGlobalPtr, true);
                 byte[] result = new byte[structureSize];
-                System.Runtime.InteropServices.Marshal.Copy(s_CachedHGlobalPtr, result, 0, structureSize);
+                System.Runtime.InteropServices.Marshal.Copy(_cachedHGlobalPtr, result, 0, structureSize);
                 return result;
             }
 
             /// <summary>
             /// 将数据从对象转换为二进制流。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
-            /// <param name="structure">要转换的对象。</param>
-            /// <param name="result">存储转换结果的二进制流。</param>
-            public static void StructureToBytes<T>(T structure, byte[] result)
-            {
-                StructureToBytes(structure, System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)), result, 0);
-            }
-
-            /// <summary>
-            /// 将数据从对象转换为二进制流。
-            /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
-            /// <param name="structure">要转换的对象。</param>
-            /// <param name="structureSize">要转换的对象的大小。</param>
-            /// <param name="result">存储转换结果的二进制流。</param>
-            internal static void StructureToBytes<T>(T structure, int structureSize, byte[] result)
-            {
-                StructureToBytes(structure, structureSize, result, 0);
-            }
-
-            /// <summary>
-            /// 将数据从对象转换为二进制流。
-            /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="structure">要转换的对象。</param>
             /// <param name="result">存储转换结果的二进制流。</param>
             /// <param name="startIndex">写入存储转换结果的二进制流的起始位置。</param>
-            public static void StructureToBytes<T>(T structure, byte[] result, int startIndex)
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
+            public static void StructureToBytes<T>(T structure, byte[] result, int startIndex = 0)
             {
                 StructureToBytes(structure, System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)), result, startIndex);
             }
@@ -134,11 +98,11 @@ namespace GameFramework
             /// <summary>
             /// 将数据从对象转换为二进制流。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="structure">要转换的对象。</param>
             /// <param name="structureSize">要转换的对象的大小。</param>
             /// <param name="result">存储转换结果的二进制流。</param>
             /// <param name="startIndex">写入存储转换结果的二进制流的起始位置。</param>
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             internal static void StructureToBytes<T>(T structure, int structureSize, byte[] result, int startIndex)
             {
                 if (structureSize < 0)
@@ -162,29 +126,18 @@ namespace GameFramework
                 }
 
                 EnsureCachedHGlobalSize(structureSize);
-                System.Runtime.InteropServices.Marshal.StructureToPtr(structure, s_CachedHGlobalPtr, true);
-                System.Runtime.InteropServices.Marshal.Copy(s_CachedHGlobalPtr, result, startIndex, structureSize);
+                System.Runtime.InteropServices.Marshal.StructureToPtr(structure, _cachedHGlobalPtr, true);
+                System.Runtime.InteropServices.Marshal.Copy(_cachedHGlobalPtr, result, startIndex, structureSize);
             }
 
             /// <summary>
             /// 将数据从二进制流转换为对象。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
-            /// <param name="buffer">要转换的二进制流。</param>
-            /// <returns>存储转换结果的对象。</returns>
-            public static T BytesToStructure<T>(byte[] buffer)
-            {
-                return BytesToStructure<T>(System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)), buffer, 0);
-            }
-
-            /// <summary>
-            /// 将数据从二进制流转换为对象。
-            /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="buffer">要转换的二进制流。</param>
             /// <param name="startIndex">读取要转换的二进制流的起始位置。</param>
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <returns>存储转换结果的对象。</returns>
-            public static T BytesToStructure<T>(byte[] buffer, int startIndex)
+            public static T BytesToStructure<T>(byte[] buffer, int startIndex = 0)
             {
                 return BytesToStructure<T>(System.Runtime.InteropServices.Marshal.SizeOf(typeof(T)), buffer, startIndex);
             }
@@ -192,22 +145,10 @@ namespace GameFramework
             /// <summary>
             /// 将数据从二进制流转换为对象。
             /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
-            /// <param name="structureSize">要转换的对象的大小。</param>
-            /// <param name="buffer">要转换的二进制流。</param>
-            /// <returns>存储转换结果的对象。</returns>
-            internal static T BytesToStructure<T>(int structureSize, byte[] buffer)
-            {
-                return BytesToStructure<T>(structureSize, buffer, 0);
-            }
-
-            /// <summary>
-            /// 将数据从二进制流转换为对象。
-            /// </summary>
-            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <param name="structureSize">要转换的对象的大小。</param>
             /// <param name="buffer">要转换的二进制流。</param>
             /// <param name="startIndex">读取要转换的二进制流的起始位置。</param>
+            /// <typeparam name="T">要转换的对象的类型。</typeparam>
             /// <returns>存储转换结果的对象。</returns>
             internal static T BytesToStructure<T>(int structureSize, byte[] buffer, int startIndex)
             {
@@ -232,8 +173,8 @@ namespace GameFramework
                 }
 
                 EnsureCachedHGlobalSize(structureSize);
-                System.Runtime.InteropServices.Marshal.Copy(buffer, startIndex, s_CachedHGlobalPtr, structureSize);
-                return (T)System.Runtime.InteropServices.Marshal.PtrToStructure(s_CachedHGlobalPtr, typeof(T));
+                System.Runtime.InteropServices.Marshal.Copy(buffer, startIndex, _cachedHGlobalPtr, structureSize);
+                return (T)System.Runtime.InteropServices.Marshal.PtrToStructure(_cachedHGlobalPtr, typeof(T));
             }
         }
     }
