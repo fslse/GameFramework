@@ -54,6 +54,14 @@ namespace GameFramework
 
             if (interfaceType.FullName != null && !interfaceType.FullName.StartsWith("GameFramework.", StringComparison.Ordinal))
             {
+                // 在程序集外部定义的模块
+                string externalModuleName = $"{interfaceType.Namespace}.{interfaceType.Name.Substring(1)}";
+                Type externalModuleType = interfaceType.Assembly.GetType(externalModuleName);
+                if (typeof(GameFrameworkModule).IsAssignableFrom(externalModuleType))
+                {
+                    return GetModule(externalModuleType) as T;
+                }
+
                 throw new GameFrameworkException($"You must get a Game Framework module, but '{interfaceType.FullName}' is not.");
             }
 
