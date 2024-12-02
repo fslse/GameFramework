@@ -21,22 +21,22 @@ namespace GameFramework
         }
 
         /// <summary>
-        /// 获取游戏框架模块优先级。
-        /// </summary>
-        /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
-        internal override int Priority => 1;
-
-        /// <summary>
         /// 获取有限状态机数量。
         /// </summary>
         public int Count => _fsms.Count;
+
+        /// <summary>
+        /// 获取游戏框架模块优先级。
+        /// </summary>
+        /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
+        protected internal override int Priority => 20;
 
         /// <summary>
         /// 有限状态机管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
-        internal override void Update(float elapseSeconds, float realElapseSeconds)
+        protected internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
             _tempFsms.Clear();
             if (_fsms.Count <= 0)
@@ -63,7 +63,7 @@ namespace GameFramework
         /// <summary>
         /// 关闭并清理有限状态机管理器。
         /// </summary>
-        internal override void Shutdown()
+        protected internal override void Shutdown()
         {
             foreach (KeyValuePair<TypeNamePair, FsmBase> fsm in _fsms)
             {

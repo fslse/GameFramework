@@ -31,14 +31,14 @@ namespace GameFramework
         /// 获取游戏框架模块优先级。
         /// </summary>
         /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
-        internal override int Priority => 7;
+        protected internal override int Priority => 40;
 
         /// <summary>
         /// 事件管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
-        internal override void Update(float elapseSeconds, float realElapseSeconds)
+        protected internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
             _eventPool.Update(elapseSeconds, realElapseSeconds);
         }
@@ -46,7 +46,7 @@ namespace GameFramework
         /// <summary>
         /// 关闭并清理事件管理器。
         /// </summary>
-        internal override void Shutdown()
+        protected internal override void Shutdown()
         {
             _eventPool.Shutdown();
         }

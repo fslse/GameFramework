@@ -9,6 +9,11 @@ namespace GameFramework
     public interface IWebRequestManager
     {
         /// <summary>
+        /// 获取或设置 Web 请求超时时长，以秒为单位。
+        /// </summary>
+        float Timeout { get; set; }
+
+        /// <summary>
         /// 获取 Web 请求代理总数量。
         /// </summary>
         int TotalAgentCount { get; }
@@ -27,11 +32,6 @@ namespace GameFramework
         /// 获取等待 Web 请求数量。
         /// </summary>
         int WaitingTaskCount { get; }
-
-        /// <summary>
-        /// 获取或设置 Web 请求超时时长，以秒为单位。
-        /// </summary>
-        float Timeout { get; set; }
 
         /// <summary>
         /// Web 请求开始事件。

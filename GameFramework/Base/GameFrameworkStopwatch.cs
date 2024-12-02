@@ -36,7 +36,7 @@ namespace GameFramework
         public TimeSpan Elapsed => TimeSpan.FromTicks(ElapsedTicks);
 
         /// <summary>
-        /// Gets the total elapsed time measured by the current instance, in seconds.
+        /// Gets the total elapsed time measured by the current instance, in timer ticks.
         /// </summary>
         /// <remarks></remarks>
         public long ElapsedTicks

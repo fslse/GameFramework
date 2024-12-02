@@ -9,7 +9,7 @@ namespace GameFramework
     internal sealed partial class WebRequestManager : GameFrameworkModule, IWebRequestManager
     {
         private readonly TaskPool<WebRequestTask> _taskPool;
-        private float _timeout;
+
         private EventHandler<WebRequestStartEventArgs> _webRequestStartEventHandler;
         private EventHandler<WebRequestSuccessEventArgs> _webRequestSuccessEventHandler;
         private EventHandler<WebRequestFailureEventArgs> _webRequestFailureEventHandler;
@@ -20,11 +20,15 @@ namespace GameFramework
         public WebRequestManager()
         {
             _taskPool = new TaskPool<WebRequestTask>();
-            _timeout = 30f;
             _webRequestStartEventHandler = null;
             _webRequestSuccessEventHandler = null;
             _webRequestFailureEventHandler = null;
         }
+
+        /// <summary>
+        /// 获取或设置 Web 请求超时时长，以秒为单位。
+        /// </summary>
+        public float Timeout { get; set; } = 30f;
 
         /// <summary>
         /// 获取 Web 请求代理总数量。
@@ -45,15 +49,6 @@ namespace GameFramework
         /// 获取等待 Web 请求数量。
         /// </summary>
         public int WaitingTaskCount => _taskPool.WaitingTaskCount;
-
-        /// <summary>
-        /// 获取或设置 Web 请求超时时长，以秒为单位。
-        /// </summary>
-        public float Timeout
-        {
-            get => _timeout;
-            set => _timeout = value;
-        }
 
         /// <summary>
         /// Web 请求开始事件。
@@ -83,11 +78,17 @@ namespace GameFramework
         }
 
         /// <summary>
+        /// 获取游戏框架模块优先级。
+        /// </summary>
+        /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
+        protected internal override int Priority => 10;
+
+        /// <summary>
         /// Web 请求管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
-        internal override void Update(float elapseSeconds, float realElapseSeconds)
+        protected internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
             _taskPool.Update(elapseSeconds, realElapseSeconds);
         }
@@ -95,7 +96,7 @@ namespace GameFramework
         /// <summary>
         /// 关闭并清理 Web 请求管理器。
         /// </summary>
-        internal override void Shutdown()
+        protected internal override void Shutdown()
         {
             _taskPool.Shutdown();
         }
@@ -361,7 +362,7 @@ namespace GameFramework
                 throw new GameFrameworkException("You must add web request agent first.");
             }
 
-            WebRequestTask webRequestTask = WebRequestTask.Create(webRequestUri, postData, tag, priority, _timeout, userData);
+            WebRequestTask webRequestTask = WebRequestTask.Create(webRequestUri, postData, tag, priority, Timeout, userData);
             _taskPool.AddTask(webRequestTask);
             return webRequestTask.SerialId;
         }

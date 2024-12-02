@@ -27,22 +27,22 @@ namespace GameFramework
         }
 
         /// <summary>
-        /// 获取游戏框架模块优先级。
-        /// </summary>
-        /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
-        internal override int Priority => 6;
-
-        /// <summary>
         /// 获取对象池数量。
         /// </summary>
         public int Count => _objectPools.Count;
+
+        /// <summary>
+        /// 获取游戏框架模块优先级。
+        /// </summary>
+        /// <remarks>优先级较高的模块会优先轮询，并且关闭操作会后进行。</remarks>
+        protected internal override int Priority => 30;
 
         /// <summary>
         /// 对象池管理器轮询。
         /// </summary>
         /// <param name="elapseSeconds">逻辑流逝时间，以秒为单位。</param>
         /// <param name="realElapseSeconds">真实流逝时间，以秒为单位。</param>
-        internal override void Update(float elapseSeconds, float realElapseSeconds)
+        protected internal override void Update(float elapseSeconds, float realElapseSeconds)
         {
             foreach (KeyValuePair<TypeNamePair, ObjectPoolBase> objectPool in _objectPools)
             {
@@ -53,7 +53,7 @@ namespace GameFramework
         /// <summary>
         /// 关闭并清理对象池管理器。
         /// </summary>
-        internal override void Shutdown()
+        protected internal override void Shutdown()
         {
             foreach (KeyValuePair<TypeNamePair, ObjectPoolBase> objectPool in _objectPools)
             {
